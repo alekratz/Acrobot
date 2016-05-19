@@ -1,7 +1,9 @@
-#!/usr/bin/python
+#!/usr/bin/env python2
 #
 # YAAB: Yet Another AcroBot - plays a game of acro on IRC
 # Copyright (C) 2005 by Calvin Harding (Cenobite) <cenobite@enslaved.za.net>
+# Alek helped too!
+# Copyright (C) 2005 Alek Ratzloff (intercal) <alekratz@gmail.com>
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -32,8 +34,8 @@ acro_time = 90 # Seconds to come up with an acro
 vote_time = 45 # Seconds to vote on acros
 start_acro= 3  # The number of letters in the first round
 rounds    = 5  # Number of rounds (letters in acro goes up once each round
-total_weight = 70 # Total weight. If you change one of the weight values, add or subtract this accordingly
 weight   = [3, 3, 3, 3, 3, 4, 3, 3, 3, 3, 2, 3, 3, 3, 3, 3, 1, 3, 3, 3, 3, 2, 2, 1, 2, 2]
+total_weight = sum(weight) # Total weight.
           # A  B  C  D  E  F  G  H  I  J  K  L  M  N  O  P  Q  R  S  T  U  V  W  X  Y  Z
 alphabet = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
 	   # Weight determines the chance that a certain letter will come up in an acro
@@ -72,8 +74,8 @@ class AcroBot(ircbot.SingleServerIRCBot):
 		self.chan = chan
 		
 		self.rnd = random.Random(time.time())
-		self.mode_switcher = threading.Timer(acro_time, self.switch_mode)
-		self.vote_time = threading.Timer(vote_time, self.round)
+		# self.mode_switcher = threading.Timer(acro_time, self.switch_mode)
+		# self.vote_time = threading.Timer(vote_time, self.round)
 				
 		self.on = false
 		self.scores = {}
@@ -126,13 +128,16 @@ class AcroBot(ircbot.SingleServerIRCBot):
 		self.mode = "ACRO"
 		self.connection.privmsg(self.chan, "\x0304\x1FRound " + str(self.which_round) + "!\x0F \x0304The new acro is: \x02\x0303" + self.acro)
 		threading.Timer(acro_time, self.switch_mode).start()
+		threading.Timer(acro_time - 15, self.warn_time).start()
 		
 	def switch_mode(self):
 		self.mode = "VOTE"
 		self.connection.privmsg(self.chan, "\x02\x0304Acro time is up! Please vote now on the following choices:")
 		for a in range(len(self.this_round_acros)):
 			self.connection.privmsg(self.chan, "\x0306\x1F#" + str(a) + "\x0F: \x02\x0312" + self.this_round_acros[a])
+		self.connection.privmsg(self.chan, "\x02\x0304You have " + str(vote_time) + " seconds to submit your vote.")
 		threading.Timer(vote_time, self.round).start()
+		threading.Timer(vote_time - 15, self.warn_time).start()
 		
 	def startgame(self):
 		# The following (hopefully) fixes a bug that carries
@@ -149,8 +154,13 @@ class AcroBot(ircbot.SingleServerIRCBot):
 		self.mode = "ACRO"
 		self.connection.privmsg(self.chan, "\x02\x0304Starting a new game of acro! Get ready!")
 		self.connection.privmsg(self.chan, "\x0304\x1FRound " + str(self.which_round) + "!\x0F \x0304The new acro is: \x02\x0303" + self.acro)
+		self.connection.privmsg(self.chan, "\x02\x0304You have " + str(acro_time) + " seconds to make your submission.")
 		threading.Timer(acro_time, self.switch_mode).start()
+		threading.Timer(acro_time - 15, self.warn_time).start()
 	
+	def warn_time(self):
+		self.connection.privmsg(self.chan, "\x02\x030415 seconds left.")
+
 	def endgame(self):
 		msg = self.connection.privmsg
 		msg(self.chan, "\x02\x0304The game is over!")
