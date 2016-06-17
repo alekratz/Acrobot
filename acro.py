@@ -34,9 +34,9 @@ acro_time = 90 # Seconds to come up with an acro
 vote_time = 45 # Seconds to vote on acros
 start_acro= 3  # The number of letters in the first round
 rounds    = 5  # Number of rounds (letters in acro goes up once each round
-weight   = [3, 3, 3, 3, 3, 4, 3, 3, 3, 3, 2, 3, 3, 3, 3, 3, 1, 3, 3, 3, 3, 2, 2, 1, 2, 2]
-total_weight = sum(weight) # Total weight.
+weight   = [10, 10, 10, 10, 10, 10, 8, 8, 8, 1, 8, 10, 10, 10, 5, 10, 1, 10, 10, 10, 6, 6, 8, 1, 6, 6]
           # A  B  C  D  E  F  G  H  I  J  K  L  M  N  O  P  Q  R  S  T  U  V  W  X  Y  Z
+total_weight = sum(weight) # Total weight.
 alphabet = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
 	   # Weight determines the chance that a certain letter will come up in an acro
 	   # The higher the number, the greater chance. Tweak this if difficult letters come up
@@ -45,11 +45,11 @@ alphabet = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N'
 	   #  an array, and it looked like a good place to put it.
 allow_doubles	= true 	# Allow the same letter twice in a row
 allow_triples	= false # Allow the same letter three times in a row
-servers		= [["lancre.lagnet.org.za", 6667, "b4nb0t"], ["dragon.lagnet.org.za", 6667]]
-nick		= "Jester"
-chan		= "#games"
-chanowner	= "nooner"
-botmaster	= "Cenobite"
+servers		= [["irc.bonerjamz.us", 6667]]
+nick		= "Acrotest"
+chan		= "#testchamber"
+chanowner	= "\\"
+botmaster	= "intercal"
 
 # Colours and formatting. TODO: finish this and implement it!
 bold		= "\x02"
@@ -210,9 +210,9 @@ class AcroBot(ircbot.SingleServerIRCBot):
 		elif self.mode == "VOTE":
 			try:
 				vote = int(string.split(e.arguments()[0])[0])
-				if irclib.nm_to_n(e.source()) not in self.this_round_nicks:
-					c.notice(irclib.nm_to_n(e.source()), "You can't vote if you don't participate.")
-					return
+#				if irclib.nm_to_n(e.source()) not in self.this_round_nicks:
+#          c.notice(irclib.nm_to_n(e.source()), "You can't vote if you don't participate.")
+#					return
 				if irclib.nm_to_n(e.source()) == self.this_round_nicks[vote]:
 					c.notice(irclib.nm_to_n(e.source()), "You can't vote for yourself. Try again.")
 					return
